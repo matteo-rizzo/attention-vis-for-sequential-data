@@ -7,18 +7,19 @@ import torch
 
 TARGET = ['Meara', 'BarChartLit'][0]
 SEC = 1
-DATASET_NAME = "{} ({} sec)".format(TARGET, SEC)
+# DATASET_NAME = "{} ({} sec)".format(TARGET, SEC)
+DATASET_NAME = "confusion"
 PATH_TO_DATASET = os.path.join("dataset", DATASET_NAME)
 PATH_TO_SEQS = os.path.join(PATH_TO_DATASET, "sequences")
-MAX_SEQ_LEN = 30
+MAX_SEQ_LEN = 150
 TRUNCATION_SIDE = ['head', 'tail'][0]
 
 # -- Network --
 
-INPUT_SIZE = 10
+INPUT_SIZE = 14
 OUTPUT_SIZE = 2
 HIDDEN_SIZE = 256
-BIDIRECTIONAL = True
+BIDIRECTIONAL = False
 NUM_LAYERS = 1
 DROPOUT = 0.0
 RNN_TYPE = "GRU"
@@ -31,7 +32,7 @@ EPOCHS = 100
 LEARNING_RATE = 0.00003
 BATCH_SIZE = 128
 PATH_TO_LOG = os.path.join("logs", "attention_rnn_" + str(time.time()))
-PATH_TO_PRETRAINED = os.path.join("trained_models")
+PATH_TO_PRETRAINED = os.path.join("trained_models", "confusion")
 
 # --- Device ---
 

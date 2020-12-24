@@ -1,3 +1,5 @@
+import random
+
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import GroupShuffleSplit
@@ -21,7 +23,8 @@ class Splitter:
     @staticmethod
     def get_group(filename: str) -> str:
         """ Grouping policy """
-        return filename.split('-')[0]
+        # return filename.split('-')[0]
+        return filename.split('_')[0][:-1]
 
     def read_paths(self, path_to_sequences: str):
 
@@ -82,21 +85,50 @@ class Splitter:
 
         return split_info
 
+    @staticmethod
+    def __down_sample(x_train: list, y_train: list) -> tuple:
+        data = {0: [], 1: []}
+        for (x, y) in zip(x_train, y_train):
+            data[y] += [(x, y)]
+        data[0] = random.sample(data[0], k=len(data[1]) * 3)
+        x_train, y_train = zip(*data[0] + data[1])
+        return x_train, y_train
+
+    @staticmethod
+    def print_split_overview(labels: dict):
+        for set_type, y in labels.items():
+            num_pos = sum(y)
+            num_neg = len(y) - num_pos
+            print("\n{} items:\n".format(set_type.capitalize()))
+            print("\t- Pos: {}".format(num_pos))
+            print("\t- Neg: {}".format(num_neg))
+
     def load_split_datasets(self, fold: int) -> dict:
         """ Loads the data based on the fold paths """
 
         fold_paths = self.__split_data[fold]
+
         x_train_paths, y_train = fold_paths['train']
+        x_train_paths, y_train = self.__down_sample(x_train_paths, y_train)
+
         x_val_paths, y_val = fold_paths['val']
         x_test_paths, y_test = fold_paths['test']
 
+        self.print_split_overview({"train": y_train, "val": y_val, "test": y_test})
+
         pp = Preprocess(self.__max_sequence_length, self.__truncation_side)
 
-        return {
-            'train': ETDataset(x_train_paths, y_train, transform=pp.transform),
-            'val': ETDataset(x_val_paths, y_val, transform=pp.transform),
-            'test': ETDataset(x_test_paths, y_test, transform=pp.transform)
+        train_dataset = ETDataset(x_train_paths, y_train, transform=pp.transform)
+        val_dataset = ETDataset(x_val_paths, y_val, transform=pp.transform)
+        test_dataset = ETDataset(x_test_paths, y_test, transform=pp.transform)
+
+        datasets = {
+            'train': train_dataset,
+            'val': val_dataset,
+            'test': test_dataset
         }
+
+        return datasets
 
     def load_full_dataset(self, fold: int) -> ETDataset:
 

@@ -9,7 +9,7 @@ from classes.networks.AttentionRNN import AttentionRNN
 from functions.metrics import compute_batch_accuracy, compute_optimal_roc_threshold, compute_metrics, pprint_metrics
 from params import *
 
-PATH_TO_PLOTS = os.path.join("plots", "plot_{}".format(time.time()))
+PATH_TO_PLOTS = os.path.join("plots", "confusion_{}".format(time.time()))
 os.makedirs(PATH_TO_PLOTS)
 
 
@@ -119,7 +119,6 @@ def main():
     splitter.load_split_from_file(os.path.join(PATH_TO_DATASET, "folds_seed_0.csv"))
 
     for fold in range(K):
-
         print("\n ---------------------------------------------- \n")
         print("\t Plotting attention for fold {}/{}".format(fold + 1, K))
         print("\n ---------------------------------------------- \n")
@@ -132,7 +131,7 @@ def main():
 
         network = AttentionRNN(return_attention=True).to(DEVICE)
         print("\n Loading pretrained model... \n")
-        path_to_pretrained = os.path.join(PATH_TO_PRETRAINED, "trained_fold_{}.pth".format(fold))
+        path_to_pretrained = os.path.join(PATH_TO_PRETRAINED, "fold_{}_best_model.pth".format(fold))
         network.load_state_dict(torch.load(path_to_pretrained, map_location=DEVICE))
         print(network)
 
